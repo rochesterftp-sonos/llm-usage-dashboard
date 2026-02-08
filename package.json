@@ -1,0 +1,23 @@
+{
+  "name": "llm-usage-dashboard",
+  "version": "1.0.0",
+  "description": "Real-time LLM usage tracking dashboard for OpenAI, Anthropic, and OpenRouter",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["llm", "dashboard", "openai", "anthropic", "openrouter", "usage", "monitoring"],
+  "author": "Steve Ventes - L2CS",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.5",
+    "chart.js": "^4.4.1",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "node-cron": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
