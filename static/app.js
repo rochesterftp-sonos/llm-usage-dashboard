@@ -148,6 +148,16 @@ function updateProvider(provider, data) {
     document.getElementById(`${provider}-cost`).textContent = 
         `$${cost.toFixed(2)}`;
     
+    // Show API limitation note if present
+    if (data.note || data.apiLimitationNote) {
+        const noteEl = document.getElementById(`${provider}-note`);
+        const noteText = document.getElementById(`${provider}-note-text`);
+        if (noteEl && noteText) {
+            noteText.textContent = data.note || data.apiLimitationNote;
+            noteEl.style.display = 'block';
+        }
+    }
+    
     // Billing cycle
     if (data.billingCycle) {
         const { daysRemaining, progress } = data.billingCycle;

@@ -445,6 +445,25 @@ footer a:hover {
     }
 }
 
+/* Provider Notes */
+.provider-note {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    font-size: 0.85em;
+    color: #92400e;
+}
+
+.provider-note p {
+    margin-bottom: 0.5rem;
+}
+
+.provider-note a {
+    font-weight: 500;
+}
+
 @media (max-width: 480px) {
     .kpi-grid {
         grid-template-columns: 1fr;

@@ -147,19 +147,14 @@ async function fetchOpenAIUsage() {
   try {
     if (!settings.openaiKey) return null;
     
-    const response = await axios.get('https://api.openai.com/v1/usage', {
-      headers: {
-        'Authorization': `Bearer ${settings.openaiKey}`
-      },
-      params: {
-        date: new Date().toISOString().split('T')[0]
-      }
-    });
-    
+    // Note: OpenAI API keys cannot access billing/usage data via API
+    // Usage data requires browser session authentication and is not accessible via API key
     return {
-      tokens: response.data.total_usage || 0,
-      cost: calculateCost('openai', response.data.total_usage || 0),
-      lastUpdated: new Date().toISOString()
+      tokens: 0,
+      cost: 0,
+      lastUpdated: new Date().toISOString(),
+      note: 'OpenAI usage data requires browser login at https://platform.openai.com/account/billing/overview',
+      apiLimitationNote: 'API keys do not have access to billing endpoints for security reasons'
     };
   } catch (error) {
     console.error('OpenAI fetch error:', error.message);
@@ -172,13 +167,14 @@ async function fetchAnthropicUsage() {
   try {
     if (!settings.anthropicKey) return null;
     
-    // Anthropic doesn't have a direct usage API - we'll estimate from logs
-    // For now, return placeholder
+    // Anthropic doesn't expose a public usage API endpoint
+    // Usage data must be retrieved from console.anthropic.com
     return {
       tokens: 0,
       cost: 0,
       lastUpdated: new Date().toISOString(),
-      note: 'Anthropic usage tracking requires session history parsing'
+      note: 'Anthropic usage data requires console login at https://console.anthropic.com',
+      apiLimitationNote: 'Anthropic does not provide a usage API for programmatic access'
     };
   } catch (error) {
     console.error('Anthropic fetch error:', error.message);
@@ -198,11 +194,11 @@ async function fetchOpenRouterUsage() {
     });
     
     return {
-      tokens: response.data.usage?.total || 0,
-      cost: response.data.usage?.cost || 0,
+      tokens: Math.round((response.data.data.usage_monthly || response.data.data.usage || 0) * 10000), // Convert $ to estimate tokens
+      cost: response.data.data.usage_monthly || response.data.data.usage || 0,
       lastUpdated: new Date().toISOString(),
-      limit: response.data.limit,
-      remaining: response.data.limit - (response.data.usage?.cost || 0)
+      limit: response.data.data.limit,
+      remaining: (response.data.data.limit || null) ? response.data.data.limit - (response.data.data.usage_monthly || 0) : null
     };
   } catch (error) {
     console.error('OpenRouter fetch error:', error.message);

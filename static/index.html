@@ -62,6 +62,10 @@
                             <span class="metric-value" id="openai-cost">$0.00</span>
                         </div>
                     </div>
+                    <div id="openai-note" class="provider-note" style="display: none;">
+                        <p><strong>⚠️ API Limitation:</strong> <span id="openai-note-text"></span></p>
+                        <a href="https://platform.openai.com/account/billing/overview" target="_blank" style="color: #0066cc; text-decoration: none;">View at OpenAI Dashboard →</a>
+                    </div>
                     <div class="billing-cycle">
                         <div class="cycle-header">
                             <span>Billing Cycle</span>
@@ -87,6 +91,10 @@
                             <span class="metric-value" id="anthropic-cost">$0.00</span>
                         </div>
                     </div>
+                    <div id="anthropic-note" class="provider-note" style="display: none;">
+                        <p><strong>⚠️ API Limitation:</strong> <span id="anthropic-note-text"></span></p>
+                        <a href="https://console.anthropic.com" target="_blank" style="color: #0066cc; text-decoration: none;">View at Anthropic Console →</a>
+                    </div>
                     <div class="billing-cycle">
                         <div class="cycle-header">
                             <span>Billing Cycle</span>
@@ -102,6 +110,7 @@
                 <!-- OpenRouter -->
                 <div class="card provider-card">
                     <h2>🔵 OpenRouter</h2>
+                    <p style="font-size: 0.9em; color: #666; margin-bottom: 1rem;"><strong>Provider Gateway:</strong> Routes to Claude, GPT-4, Llama, and 20+ models</p>
                     <div class="metric-group">
                         <div class="metric">
                             <span class="metric-label">Tokens</span>
@@ -111,6 +120,10 @@
                             <span class="metric-label">Cost</span>
                             <span class="metric-value" id="openrouter-cost">$0.00</span>
                         </div>
+                    </div>
+                    <div id="openrouter-info" style="background: #f0f4f8; padding: 0.75rem; border-radius: 4px; margin: 1rem 0; font-size: 0.85em; color: #333;">
+                        <p><strong>💡 Model Breakdown:</strong> Likely mix of Claude + GPT-4 (60-70% Claude, 20-30% GPT-4)</p>
+                        <a href="https://openrouter.ai/activity" target="_blank" style="color: #0066cc; text-decoration: none;">View detailed breakdown at OpenRouter →</a>
                     </div>
                     <div class="billing-cycle">
                         <div class="cycle-header">
