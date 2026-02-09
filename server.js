@@ -116,6 +116,11 @@ app.use(session({
 app.use(express.static('public'));
 app.use(express.json());
 
+// Health check (for debugging)
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', server: 'running', env: process.env.NODE_ENV });
+});
+
 // Authentication middleware
 function requireAuth(req, res, next) {
   if (req.session.authenticated) {
