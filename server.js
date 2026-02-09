@@ -426,7 +426,12 @@ app.get('/api/recommendations', requireAuth, (req, res) => {
 
 // Initialize
 (async () => {
-  await loadSettings();
+  try {
+    await loadSettings();
+    console.log('Settings loaded successfully');
+  } catch (error) {
+    console.log('Could not load settings file, using environment variables:', error.message);
+  }
   
   // Update usage every 5 minutes
   cron.schedule('*/5 * * * *', updateUsageData);
