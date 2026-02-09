@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - LLM Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .settings-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .settings-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .settings-section h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: monospace;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .nav-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-header a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .nav-header a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle button {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .settings-container {
+                padding: 1rem;
+            }
+
+            .settings-section {
+                padding: 1rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-header">
+        <h1>⚙️ Settings</h1>
+        <div>
+            <a href="/">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="settings-container">
+        <div class="alert" id="alert"></div>
+
+        <form id="settingsForm">
+            <!-- Security Section -->
+            <div class="settings-section">
+                <h2>🔐 Security</h2>
+                
+                <div class="form-group">
+                    <label for="dashboardPassword">Dashboard Password</label>
+                    <input type="password" id="dashboardPassword" name="dashboardPassword" autocomplete="new-password">
+                    <small>Password required to access the dashboard</small>
+                </div>
+            </div>
+
+            <!-- OpenAI Section -->
+            <div class="settings-section">
+                <h2>🤖 OpenAI</h2>
+                
+                <div class="form-group password-toggle">
+                    <label for="openaiKey">API Key</label>
+                    <input type="password" id="openaiKey" name="openaiKey" placeholder="sk-..." autocomplete="off">
+                    <button type="button" onclick="togglePassword('openaiKey')">Show</button>
+                    <small>Your OpenAI API key (starts with sk-)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="openaiCycle">Billing Cycle Day</label>
+                    <input type="number" id="openaiCycle" name="openaiCycle" min="1" max="31" placeholder="1">
+                    <small>Day of month when billing cycle starts (1-31)</small>
+                </div>
+            </div>
+
+            <!-- Anthropic Section -->
+            <div class="settings-section">
+                <h2>🧠 Anthropic</h2>
+                
+                <div class="form-group password-toggle">
+                    <label for="anthropicKey">API Key</label>
+                    <input type="password" id="anthropicKey" name="anthropicKey" placeholder="sk-ant-..." autocomplete="off">
+                    <button type="button" onclick="togglePassword('anthropicKey')">Show</button>
+                    <small>Your Anthropic API key (starts with sk-ant-)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="anthropicCycle">Billing Cycle Day</label>
+                    <input type="number" id="anthropicCycle" name="anthropicCycle" min="1" max="31" placeholder="1">
+                    <small>Day of month when billing cycle starts (1-31)</small>
+                </div>
+            </div>
+
+            <!-- OpenRouter Section -->
+            <div class="settings-section">
+                <h2>🔀 OpenRouter</h2>
+                
+                <div class="form-group password-toggle">
+                    <label for="openrouterKey">API Key</label>
+                    <input type="password" id="openrouterKey" name="openrouterKey" placeholder="sk-or-..." autocomplete="off">
+                    <button type="button" onclick="togglePassword('openrouterKey')">Show</button>
+                    <small>Your OpenRouter API key (starts with sk-or-)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="openrouterCycle">Billing Cycle Day</label>
+                    <input type="number" id="openrouterCycle" name="openrouterCycle" min="1" max="31" placeholder="1">
+                    <small>Day of month when billing cycle starts (1-31)</small>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">💾 Save Settings</button>
+                <button type="button" class="btn btn-secondary" onclick="testConnection()">🔌 Test Connection</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Check authentication
+        async function checkAuth() {
+            const response = await fetch('/api/auth-status');
+            const data = await response.json();
+            if (!data.authenticated) {
+                window.location.href = '/';
+            }
+        }
+
+        // Load existing settings
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/settings');
+                if (response.ok) {
+                    const settings = await response.json();
+                    
+                    // Populate form (don't show actual API keys, just placeholders)
+                    if (settings.dashboardPassword) {
+                        document.getElementById('dashboardPassword').placeholder = '••••••••';
+                    }
+                    if (settings.openaiKey) {
+                        document.getElementById('openaiKey').placeholder = 'sk-...••••';
+                    }
+                    if (settings.anthropicKey) {
+                        document.getElementById('anthropicKey').placeholder = 'sk-ant-...••••';
+                    }
+                    if (settings.openrouterKey) {
+                        document.getElementById('openrouterKey').placeholder = 'sk-or-...••••';
+                    }
+
+                    // Populate billing cycles
+                    document.getElementById('openaiCycle').value = settings.openaiCycle || '';
+                    document.getElementById('anthropicCycle').value = settings.anthropicCycle || '';
+                    document.getElementById('openrouterCycle').value = settings.openrouterCycle || '';
+                }
+            } catch (error) {
+                console.error('Failed to load settings:', error);
+            }
+        }
+
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const input = document.getElementById(fieldId);
+            const button = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = 'Hide';
+            } else {
+                input.type = 'password';
+                button.textContent = 'Show';
+            }
+        }
+
+        // Show alert
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type} show`;
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+
+        // Save settings
+        document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const settings = {};
+            
+            // Only include non-empty fields
+            for (const [key, value] of formData.entries()) {
+                if (value.trim()) {
+                    settings[key] = value;
+                }
+            }
+
+            try {
+                const response = await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+
+                if (response.ok) {
+                    showAlert('✅ Settings saved successfully! Dashboard will refresh data.', 'success');
+                    // Clear password fields
+                    document.getElementById('dashboardPassword').value = '';
+                    document.getElementById('openaiKey').value = '';
+                    document.getElementById('anthropicKey').value = '';
+                    document.getElementById('openrouterKey').value = '';
+                    // Reload settings to show masked values
+                    setTimeout(() => loadSettings(), 1000);
+                } else {
+                    const error = await response.json();
+                    showAlert(`❌ Failed to save settings: ${error.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`❌ Network error: ${error.message}`, 'error');
+            }
+        });
+
+        // Test connection
+        async function testConnection() {
+            try {
+                showAlert('🔌 Testing API connections...', 'success');
+                const response = await fetch('/api/test-connections', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const results = await response.json();
+                    let message = 'Connection Test Results:\n';
+                    message += `OpenAI: ${results.openai ? '✅' : '❌'}\n`;
+                    message += `Anthropic: ${results.anthropic ? '✅' : '❌'}\n`;
+                    message += `OpenRouter: ${results.openrouter ? '✅' : '❌'}`;
+                    alert(message);
+                } else {
+                    showAlert('❌ Connection test failed', 'error');
+                }
+            } catch (error) {
+                showAlert(`❌ Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize
+        checkAuth();
+        loadSettings();
+    </script>
+</body>
+</html>

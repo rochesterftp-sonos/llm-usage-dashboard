@@ -3,520 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLM Usage Dashboard - L2CS</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-        
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        button {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        
-        button:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        .update-time {
-            background: #1e293b;
-            padding: 12px 24px;
-            border-radius: 8px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .card {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            border: 1px solid #334155;
-        }
-        
-        .card h2 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .provider-card {
-            border-left: 4px solid;
-        }
-        
-        .provider-card.openai {
-            border-left-color: #10b981;
-        }
-        
-        .provider-card.anthropic {
-            border-left-color: #f59e0b;
-        }
-        
-        .provider-card.openrouter {
-            border-left-color: #8b5cf6;
-        }
-        
-        .metric {
-            margin-bottom: 20px;
-        }
-        
-        .metric-label {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            margin-bottom: 5px;
-        }
-        
-        .metric-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #e2e8f0;
-        }
-        
-        .metric-value.cost {
-            color: #10b981;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #334155;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-            transition: width 0.3s ease;
-        }
-        
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .kpi {
-            background: #0f172a;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .kpi-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #3b82f6;
-        }
-        
-        .kpi-label {
-            font-size: 0.85rem;
-            color: #94a3b8;
-            margin-top: 5px;
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-top: 20px;
-        }
-        
-        .recommendations {
-            margin-top: 30px;
-        }
-        
-        .recommendation {
-            background: #1e293b;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .recommendation.high {
-            border-left-color: #ef4444;
-        }
-        
-        .recommendation.warning {
-            border-left-color: #f59e0b;
-        }
-        
-        .recommendation.info {
-            border-left-color: #3b82f6;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            font-size: 1.2rem;
-            color: #94a3b8;
-        }
-    </style>
+    <title>LLM Usage Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🤖 LLM Usage Dashboard</h1>
-            <div class="subtitle">Real-time monitoring for OpenAI, Anthropic & OpenRouter</div>
-        </header>
-        
-        <div class="controls">
-            <button onclick="refreshData()">🔄 Update Now</button>
-            <div class="update-time">
-                <span>Last updated:</span>
-                <span id="lastUpdate">Never</span>
-            </div>
-        </div>
-        
-        <div class="grid">
-            <!-- OpenAI Card -->
-            <div class="card provider-card openai">
-                <h2>OpenAI</h2>
-                <div class="metric">
-                    <div class="metric-label">Total Tokens</div>
-                    <div class="metric-value" id="openai-tokens">0</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Cost</div>
-                    <div class="metric-value cost" id="openai-cost">$0.00</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Billing Cycle</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="openai-progress" style="width: 0%"></div>
-                    </div>
-                    <small id="openai-cycle-info" style="color: #94a3b8; margin-top: 5px; display: block;"></small>
-                </div>
-            </div>
-            
-            <!-- Anthropic Card -->
-            <div class="card provider-card anthropic">
-                <h2>Anthropic</h2>
-                <div class="metric">
-                    <div class="metric-label">Total Tokens</div>
-                    <div class="metric-value" id="anthropic-tokens">0</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Cost</div>
-                    <div class="metric-value cost" id="anthropic-cost">$0.00</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Billing Cycle</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="anthropic-progress" style="width: 0%"></div>
-                    </div>
-                    <small id="anthropic-cycle-info" style="color: #94a3b8; margin-top: 5px; display: block;"></small>
-                </div>
-            </div>
-            
-            <!-- OpenRouter Card -->
-            <div class="card provider-card openrouter">
-                <h2>OpenRouter</h2>
-                <div class="metric">
-                    <div class="metric-label">Total Tokens</div>
-                    <div class="metric-value" id="openrouter-tokens">0</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Cost</div>
-                    <div class="metric-value cost" id="openrouter-cost">$0.00</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Billing Cycle</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="openrouter-progress" style="width: 0%"></div>
-                    </div>
-                    <small id="openrouter-cycle-info" style="color: #94a3b8; margin-top: 5px; display: block;"></small>
-                </div>
-            </div>
-        </div>
-        
-        <!-- KPIs -->
-        <div class="card">
-            <h2>Key Performance Indicators</h2>
-            <div class="kpi-grid">
-                <div class="kpi">
-                    <div class="kpi-value" id="kpi-total-cost">$0.00</div>
-                    <div class="kpi-label">Total Cost (Month)</div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-value" id="kpi-total-tokens">0</div>
-                    <div class="kpi-label">Total Tokens</div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-value" id="kpi-avg-cost">$0.00</div>
-                    <div class="kpi-label">Avg Cost/Day</div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-value" id="kpi-projected">$0.00</div>
-                    <div class="kpi-label">Projected Monthly</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Charts -->
-        <div class="card">
-            <h2>Usage Trends</h2>
-            <div class="chart-container">
-                <canvas id="usageChart"></canvas>
-            </div>
-        </div>
-        
-        <!-- Recommendations -->
-        <div class="recommendations">
-            <div class="card">
-                <h2>💡 Recommendations</h2>
-                <div id="recommendations-container">
-                    <div class="loading">Loading recommendations...</div>
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen">
+        <div class="container">
+            <div class="card login-card">
+                <h1>🤖 LLM Usage Dashboard</h1>
+                <p class="subtitle">Level 2 Compliance Solutions</p>
+                <form id="login-form">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        placeholder="Enter password" 
+                        required 
+                        autocomplete="current-password"
+                    >
+                    <button type="submit">Login</button>
+                </form>
+                <p id="login-error" class="error"></p>
+                <div class="footer-links">
+                    <a href="security.html">Security Information</a>
                 </div>
             </div>
         </div>
     </div>
-    
-    <script>
-        let usageChart;
-        
-        async function fetchData() {
-            const response = await fetch('/api/usage');
-            return response.json();
-        }
-        
-        async function fetchRecommendations() {
-            const response = await fetch('/api/recommendations');
-            return response.json();
-        }
-        
-        async function refreshData() {
-            const response = await fetch('/api/refresh', { method: 'POST' });
-            const data = await response.json();
-            updateUI(data.data);
-            updateRecommendations();
-        }
-        
-        function formatNumber(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(2) + 'M';
-            } else if (num >= 1000) {
-                return (num / 1000).toFixed(2) + 'K';
-            }
-            return num.toFixed(0);
-        }
-        
-        function updateUI(data) {
-            // Update OpenAI
-            document.getElementById('openai-tokens').textContent = formatNumber(data.openai.tokens || 0);
-            document.getElementById('openai-cost').textContent = '$' + (data.openai.cost || 0).toFixed(2);
-            if (data.openai.billingCycle) {
-                document.getElementById('openai-progress').style.width = data.openai.billingCycle.progress + '%';
-                document.getElementById('openai-cycle-info').textContent = 
-                    `${data.openai.billingCycle.daysElapsed} days elapsed, ${data.openai.billingCycle.daysRemaining} remaining`;
-            }
-            
-            // Update Anthropic
-            document.getElementById('anthropic-tokens').textContent = formatNumber(data.anthropic.tokens || 0);
-            document.getElementById('anthropic-cost').textContent = '$' + (data.anthropic.cost || 0).toFixed(2);
-            if (data.anthropic.billingCycle) {
-                document.getElementById('anthropic-progress').style.width = data.anthropic.billingCycle.progress + '%';
-                document.getElementById('anthropic-cycle-info').textContent = 
-                    `${data.anthropic.billingCycle.daysElapsed} days elapsed, ${data.anthropic.billingCycle.daysRemaining} remaining`;
-            }
-            
-            // Update OpenRouter
-            document.getElementById('openrouter-tokens').textContent = formatNumber(data.openrouter.tokens || 0);
-            document.getElementById('openrouter-cost').textContent = '$' + (data.openrouter.cost || 0).toFixed(2);
-            if (data.openrouter.billingCycle) {
-                document.getElementById('openrouter-progress').style.width = data.openrouter.billingCycle.progress + '%';
-                document.getElementById('openrouter-cycle-info').textContent = 
-                    `${data.openrouter.billingCycle.daysElapsed} days elapsed, ${data.openrouter.billingCycle.daysRemaining} remaining`;
-            }
-            
-            // Update KPIs
-            const totalCost = (data.openai.cost || 0) + (data.anthropic.cost || 0) + (data.openrouter.cost || 0);
-            const totalTokens = (data.openai.tokens || 0) + (data.anthropic.tokens || 0) + (data.openrouter.tokens || 0);
-            const avgCycleProgress = ((data.openai.billingCycle?.progress || 0) + 
-                                     (data.anthropic.billingCycle?.progress || 0) + 
-                                     (data.openrouter.billingCycle?.progress || 0)) / 3;
-            const avgDaysElapsed = ((data.openai.billingCycle?.daysElapsed || 0) + 
-                                   (data.anthropic.billingCycle?.daysElapsed || 0) + 
-                                   (data.openrouter.billingCycle?.daysElapsed || 0)) / 3;
-            const avgCostPerDay = avgDaysElapsed > 0 ? totalCost / avgDaysElapsed : 0;
-            const projectedMonthly = avgCostPerDay * 30;
-            
-            document.getElementById('kpi-total-cost').textContent = '$' + totalCost.toFixed(2);
-            document.getElementById('kpi-total-tokens').textContent = formatNumber(totalTokens);
-            document.getElementById('kpi-avg-cost').textContent = '$' + avgCostPerDay.toFixed(2);
-            document.getElementById('kpi-projected').textContent = '$' + projectedMonthly.toFixed(2);
-            
-            // Update chart
-            updateChart(data.history);
-            
-            // Update last updated time
-            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
-        }
-        
-        function updateChart(history) {
-            const labels = history.map(h => new Date(h.timestamp).toLocaleTimeString());
-            const openaiData = history.map(h => h.openai);
-            const anthropicData = history.map(h => h.anthropic);
-            const openrouterData = history.map(h => h.openrouter);
-            
-            if (usageChart) {
-                usageChart.data.labels = labels;
-                usageChart.data.datasets[0].data = openaiData;
-                usageChart.data.datasets[1].data = anthropicData;
-                usageChart.data.datasets[2].data = openrouterData;
-                usageChart.update();
-            } else {
-                const ctx = document.getElementById('usageChart').getContext('2d');
-                usageChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'OpenAI',
-                                data: openaiData,
-                                borderColor: '#10b981',
-                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Anthropic',
-                                data: anthropicData,
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                tension: 0.4
-                            },
-                            {
-                                label: 'OpenRouter',
-                                data: openrouterData,
-                                borderColor: '#8b5cf6',
-                                backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                                tension: 0.4
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: {
-                                    color: '#e2e8f0'
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#334155' }
-                            },
-                            x: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#334155' }
-                            }
-                        }
-                    }
-                });
-            }
-        }
-        
-        async function updateRecommendations() {
-            const recommendations = await fetchRecommendations();
-            const container = document.getElementById('recommendations-container');
-            
-            if (recommendations.length === 0) {
-                container.innerHTML = '<div class="loading">✅ All systems optimal!</div>';
-                return;
-            }
-            
-            container.innerHTML = recommendations.map(rec => `
-                <div class="recommendation ${rec.severity}">
-                    <span style="font-size: 1.5rem;">${rec.severity === 'high' ? '🔴' : rec.severity === 'warning' ? '⚠️' : 'ℹ️'}</span>
-                    <div>${rec.message}</div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboard-screen" class="screen hidden">
+        <div class="container">
+            <header>
+                <h1>🤖 LLM Usage Dashboard</h1>
+                <div class="header-actions">
+                    <a href="/settings.html" class="btn-secondary" style="text-decoration: none; margin-right: 0.5rem;">⚙️ Settings</a>
+                    <button id="refresh-btn" class="btn-icon">🔄</button>
+                    <button id="logout-btn" class="btn-secondary">Logout</button>
                 </div>
-            `).join('');
-        }
-        
-        // Initial load
-        async function init() {
-            const data = await fetchData();
-            updateUI(data);
-            await updateRecommendations();
-        }
-        
-        // Auto-refresh every 5 minutes
-        setInterval(async () => {
-            const data = await fetchData();
-            updateUI(data);
-        }, 300000);
-        
-        init();
-    </script>
+            </header>
+
+            <div class="update-time">
+                Last updated: <span id="last-update">Never</span>
+            </div>
+
+            <!-- Provider Cards -->
+            <div class="provider-grid">
+                <!-- OpenAI -->
+                <div class="card provider-card">
+                    <h2>🟢 OpenAI</h2>
+                    <div class="metric-group">
+                        <div class="metric">
+                            <span class="metric-label">Tokens</span>
+                            <span class="metric-value" id="openai-tokens">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Cost</span>
+                            <span class="metric-value" id="openai-cost">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="billing-cycle">
+                        <div class="cycle-header">
+                            <span>Billing Cycle</span>
+                            <span id="openai-days">- days left</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="openai-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text" id="openai-percent">0%</span>
+                    </div>
+                </div>
+
+                <!-- Anthropic -->
+                <div class="card provider-card">
+                    <h2>🟠 Anthropic</h2>
+                    <div class="metric-group">
+                        <div class="metric">
+                            <span class="metric-label">Tokens</span>
+                            <span class="metric-value" id="anthropic-tokens">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Cost</span>
+                            <span class="metric-value" id="anthropic-cost">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="billing-cycle">
+                        <div class="cycle-header">
+                            <span>Billing Cycle</span>
+                            <span id="anthropic-days">- days left</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="anthropic-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text" id="anthropic-percent">0%</span>
+                    </div>
+                </div>
+
+                <!-- OpenRouter -->
+                <div class="card provider-card">
+                    <h2>🔵 OpenRouter</h2>
+                    <div class="metric-group">
+                        <div class="metric">
+                            <span class="metric-label">Tokens</span>
+                            <span class="metric-value" id="openrouter-tokens">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Cost</span>
+                            <span class="metric-value" id="openrouter-cost">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="billing-cycle">
+                        <div class="cycle-header">
+                            <span>Billing Cycle</span>
+                            <span id="openrouter-days">- days left</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="openrouter-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text" id="openrouter-percent">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPIs -->
+            <div class="card kpi-card">
+                <h2>📊 Key Performance Indicators</h2>
+                <div class="kpi-grid">
+                    <div class="kpi">
+                        <span class="kpi-label">Total Monthly Cost</span>
+                        <span class="kpi-value" id="kpi-total-cost">$0.00</span>
+                    </div>
+                    <div class="kpi">
+                        <span class="kpi-label">Total Tokens</span>
+                        <span class="kpi-value" id="kpi-total-tokens">0</span>
+                    </div>
+                    <div class="kpi">
+                        <span class="kpi-label">Avg $/Token</span>
+                        <span class="kpi-value" id="kpi-avg-cost">$0.000</span>
+                    </div>
+                    <div class="kpi">
+                        <span class="kpi-label">Projected Monthly</span>
+                        <span class="kpi-value" id="kpi-projected">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="card recommendations-card">
+                <h2>💡 Recommendations</h2>
+                <div id="recommendations-list">
+                    <p class="no-recommendations">Loading recommendations...</p>
+                </div>
+            </div>
+
+            <footer>
+                <a href="security.html">Security Information</a>
+                <span>L2CS LLM Dashboard v1.0</span>
+            </footer>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>

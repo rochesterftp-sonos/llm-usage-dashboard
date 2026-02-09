@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Information - LLM Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container security-page">
+        <header>
+            <h1>🔒 Security Information</h1>
+            <a href="index.html" class="btn-secondary">Back to Dashboard</a>
+        </header>
+
+        <div class="card">
+            <h2>Overview</h2>
+            <p>
+                This dashboard provides real-time monitoring of LLM API usage for Level 2 Compliance Solutions. 
+                Security and data protection are critical priorities for this application.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>🛡️ Data Protection Measures</h2>
+            <h3>API Key Security</h3>
+            <ul>
+                <li><strong>Server-Side Only:</strong> API keys are never transmitted to your browser or exposed in frontend code</li>
+                <li><strong>Environment Variables:</strong> Keys are stored as encrypted environment variables on Railway's secure platform</li>
+                <li><strong>No Client Access:</strong> Frontend code only receives aggregated usage data, never credentials</li>
+                <li><strong>HTTPS Encryption:</strong> All communication between your browser and the server is encrypted via TLS</li>
+            </ul>
+
+            <h3>Authentication</h3>
+            <ul>
+                <li><strong>Password Protection:</strong> Dashboard access requires password authentication</li>
+                <li><strong>Session Management:</strong> Secure session tokens with 24-hour expiration</li>
+                <li><strong>No Public Access:</strong> Unauthorized users cannot view usage data or make API requests</li>
+            </ul>
+
+            <h3>Data Handling</h3>
+            <ul>
+                <li><strong>No PII Storage:</strong> This dashboard does not collect, store, or transmit personally identifiable information</li>
+                <li><strong>Aggregated Metrics Only:</strong> Only token counts and costs are tracked—no message content, prompts, or responses</li>
+                <li><strong>In-Memory Cache:</strong> Usage data is stored temporarily in server memory (last 100 data points)</li>
+                <li><strong>No Database:</strong> No persistent storage of sensitive data; all data resets on server restart</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>⚠️ Potential Threats & Mitigations</h2>
+            
+            <div class="threat-item">
+                <h3>Threat: Unauthorized Dashboard Access</h3>
+                <p><strong>Risk:</strong> Someone guesses or obtains the dashboard password</p>
+                <p><strong>Mitigation:</strong></p>
+                <ul>
+                    <li>Use a strong, unique password (set in DASHBOARD_PASSWORD env var)</li>
+                    <li>Change password regularly</li>
+                    <li>Dashboard URL is not publicly listed or indexed</li>
+                    <li>Monitor Railway logs for unusual access patterns</li>
+                </ul>
+                <p><strong>Impact if Compromised:</strong> Attacker can see usage metrics but cannot access API keys or modify data</p>
+            </div>
+
+            <div class="threat-item">
+                <h3>Threat: Railway Platform Breach</h3>
+                <p><strong>Risk:</strong> Compromise of Railway hosting infrastructure</p>
+                <p><strong>Mitigation:</strong></p>
+                <ul>
+                    <li>Railway uses industry-standard security practices (SOC 2 Type II compliance)</li>
+                    <li>Environment variables encrypted at rest</li>
+                    <li>Regular security audits by Railway team</li>
+                </ul>
+                <p><strong>Impact if Compromised:</strong> Potential exposure of API keys; rotate keys immediately if breach detected</p>
+            </div>
+
+            <div class="threat-item">
+                <h3>Threat: Man-in-the-Middle (MITM) Attack</h3>
+                <p><strong>Risk:</strong> Interception of data between browser and server</p>
+                <p><strong>Mitigation:</strong></p>
+                <ul>
+                    <li>TLS/HTTPS encryption for all traffic</li>
+                    <li>Railway automatically provisions SSL certificates</li>
+                    <li>Modern cipher suites and protocols enforced</li>
+                </ul>
+                <p><strong>Impact if Compromised:</strong> Attacker could see usage data and session token; cannot see API keys (server-side only)</p>
+            </div>
+
+            <div class="threat-item">
+                <h3>Threat: API Key Leakage via Logs</h3>
+                <p><strong>Risk:</strong> API keys accidentally logged to console or error messages</p>
+                <p><strong>Mitigation:</strong></p>
+                <ul>
+                    <li>Server code does not log API keys</li>
+                    <li>Error messages sanitized to remove sensitive data</li>
+                    <li>Railway logs are access-controlled</li>
+                </ul>
+                <p><strong>Impact if Compromised:</strong> Unauthorized API usage; rotate affected keys immediately</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔐 Best Practices</h2>
+            <ul>
+                <li><strong>Use a Strong Password:</strong> Minimum 16 characters, mix of letters/numbers/symbols</li>
+                <li><strong>Don't Share the URL:</strong> Keep the dashboard link private</li>
+                <li><strong>Monitor Usage:</strong> Regularly check for unexpected spikes in token usage</li>
+                <li><strong>Rotate API Keys:</strong> Periodically rotate API keys (quarterly recommended)</li>
+                <li><strong>Log Out:</strong> Always log out when done, especially on shared devices</li>
+                <li><strong>Enable 2FA:</strong> Enable two-factor authentication on OpenAI, Anthropic, and OpenRouter accounts</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>📞 Incident Response</h2>
+            <p><strong>If you suspect a security breach:</strong></p>
+            <ol>
+                <li>Immediately change the DASHBOARD_PASSWORD in Railway environment variables</li>
+                <li>Rotate all affected API keys (OpenAI, Anthropic, OpenRouter)</li>
+                <li>Review Railway access logs for unusual activity</li>
+                <li>Check provider dashboards for unexpected API usage</li>
+                <li>Document the incident and timeline</li>
+            </ol>
+        </div>
+
+        <div class="card architecture-card">
+            <h2>🏗️ Architecture Overview</h2>
+            <div class="architecture-diagram">
+                <pre>
+┌─────────────┐
+│   Browser   │  (You)
+└──────┬──────┘
+       │ HTTPS (encrypted)
+       │ Sends password, receives usage data
+       ▼
+┌─────────────────┐
+│  Railway Server │
+│  (Node.js/Express)
+│  ├── Authentication
+│  ├── Session Management
+│  └── API Key Storage (env vars)
+└──────┬──────────┘
+       │ Authenticated API Requests
+       │ (API keys used server-side only)
+       ▼
+┌──────────────────┐
+│   LLM Providers  │
+│  ├── OpenAI
+│  ├── Anthropic
+│  └── OpenRouter
+└──────────────────┘
+                </pre>
+            </div>
+            <p><strong>Key Principle:</strong> API keys never leave the server. Your browser only receives aggregated metrics.</p>
+        </div>
+
+        <footer>
+            <a href="index.html">Back to Dashboard</a>
+            <span>L2CS LLM Dashboard v1.0</span>
+        </footer>
+    </div>
+</body>
+</html>
