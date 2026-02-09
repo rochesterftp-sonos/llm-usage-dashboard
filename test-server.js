@@ -10,7 +10,7 @@ app.get('/api/auth-status', (req, res) => {
   res.json({ authenticated: false });
 });
 
-app.use(express.static('public'));
+app.use(express.static('static'));
 
 app.listen(PORT, () => {
   console.log(`Test server on port ${PORT}`);

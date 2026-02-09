@@ -113,7 +113,7 @@ app.use(session({
 }));
 
 // Serve static files
-app.use(express.static('public'));
+app.use(express.static('static'));
 app.use(express.json());
 
 // Health check (for debugging)
